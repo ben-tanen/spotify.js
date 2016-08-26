@@ -35,7 +35,7 @@ $(document).ready(function() {
     })
 
     $('#test-btn').click(function() {
-        api.artist.getRelatedArtists('5INjqkS1o8h1imAzPqGZBb', none, 'got artists');
+        api.library.checkTracks(['4HEqM4RSvXQAXqSdqqD8qE','6golelYKuy85o3u0cxIxFK'], none, 'checking');
     });
 });
 

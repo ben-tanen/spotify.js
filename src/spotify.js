@@ -23,6 +23,9 @@
             success: function(r) {
                 if (message) console.log(message + ":", r);
                 callback(r);
+            },
+            error: function(r) {
+                console.log('error:', r);
             }
         });
     }
@@ -272,6 +275,21 @@
     // - order or replace playlist tracks
     // - change playlist details
 
+    var library = function(general) {
+        this.general = general;
+        this.login   = general.login;
+    }
+
+    library.prototype.getTracks = function(country, callback, message) {
+        var url = 'https://api.spotify.com/v1/me/tracks?market=' + encodeURIComponent(country) + '&limit=50&offset=0';
+        this.general.getURL(url, callback, message);
+    }
+
+    library.prototype.checkTracks = function(track_ids, callback, message) {
+        var url = 'https://api.spotify.com/v1/me/tracks/contains?ids=' + encodeURIComponent(track_ids.join(','));
+        this.general.getURL(url, callback, message);
+    }
+
     var SpotifyAPI = function() {
         this.login     = new login();
         this.general   = new general(this.login);
@@ -280,6 +298,7 @@
         this.artist    = new artist(this.general);
         this.album     = new album(this.general);
         this.playlist  = new playlist(this.general);
+        this.library   = new library(this.general);
     }
 
     exports.SpotifyAPI = SpotifyAPI;
