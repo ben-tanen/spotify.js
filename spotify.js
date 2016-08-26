@@ -103,7 +103,7 @@
         $.ajax(url, {
             dataType: 'json',
             headers: {
-                'Authorization': this.getAuthHeader()
+                 'Authorization': this.getAuthHeader()
             },
             success: function(r) {
                 if (loud) console.log('user info:', r);
@@ -114,35 +114,26 @@
 
     /*
     Spotify General API:
-        getSelfInfo(callback, loud)
-        getUserInfo(user_id, callback, loud)
+        getSelfInfo(callback, message)
+        getUserInfo(user_id, callback, message)
     */
     var general = function(login) {
         this.login = login;
     }
 
-    general.prototype.getUserInfo = function(user_id, callback, loud) {
+    general.prototype.getUserInfo = function(user_id, callback, message) {
         var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id);
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('user info:', r);
-                callback(r);
-            }
-        });
+        this.getURL(url, callback, message);
     }
 
-    general.prototype.getURL = function(url, callback, loud) {
+    general.prototype.getURL = function(url, callback, message) {
         $.ajax(url, {
             dataType: 'json',
             headers: {
                 'Authorization': this.login.getAuthHeader()
             },
             success: function(r) {
-                if (loud) console.log('result:', r);
+                if (message) console.log(message + ":", r);
                 callback(r);
             }
         });
@@ -152,18 +143,13 @@
     Spotify Search API:
         searchTracks(query, callback, loud)
     */
-    var search = function() {
+    var search = function(general) {
+        this.general = general;
     }
 
-    search.prototype.searchTracks = function(query, callback, loud) {
+    search.prototype.searchTracks = function(query, callback, message) {
         var url = 'https://api.spotify.com/v1/search?type=track&q='+encodeURIComponent(query);
-        $.ajax(url, {
-            dataType: 'json',
-            success: function(r) {
-                if (loud) console.log('got track results:', r);
-                callback(r.tracks.items);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     /*
@@ -173,132 +159,68 @@
         getTrackAudioFeatures(track_id, callback, loud)
         getTracksAudioFeatures(track_ids, callback, loud)
     */
-    var track = function(login) {
-        this.login = login;
+    var track = function(general) {
+        this.general = general;
+        this.login   = general.login;
     }
 
     // get info for a track
-    track.prototype.getTrack = function(track_id, callback, loud) {
+    track.prototype.getTrack = function(track_id, callback, message) {
         var url = 'https://api.spotify.com/v1/tracks/'+encodeURIComponent(track_id);
-        $.ajax(url, {
-            dataType: 'json',
-            success: function(r) {
-                if (loud) console.log('got track:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // get info for multiple tracks
-    track.prototype.getTracks = function(track_ids, callback, loud) {
+    track.prototype.getTracks = function(track_ids, callback, message) {
         var url = 'https://api.spotify.com/v1/tracks?ids='+encodeURIComponent(track_ids.join(','));
-        $.ajax(url, {
-            dataType: 'json',
-            success: function(r) {
-                if (loud) console.log('got tracks:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // get audio features for a track
-    track.prototype.getTrackAudioFeatures = function(track_id, callback, loud) {
+    track.prototype.getTrackAudioFeatures = function(track_id, callback, message) {
         var url = 'https://api.spotify.com/v1/audio-features/'+encodeURIComponent(track_id);
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('got track features:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // get audio features for multiple tracks
-    track.prototype.getTracksAudioFeatures = function(track_ids, callback, loud) {
+    track.prototype.getTracksAudioFeatures = function(track_ids, callback, message) {
         var url = 'https://api.spotify.com/v1/audio-features?ids='+encodeURIComponent(track_ids.join(','));
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('got tracks features:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // get audio analysis for a track
-    track.prototype.getTrackAudioAnalysis = function(track_id, callback, loud) {
+    track.prototype.getTrackAudioAnalysis = function(track_id, callback, message) {
         var url = 'https://api.spotify.com/v1/audio-analysis/'+encodeURIComponent(track_id);
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('got track analysis:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     /*
-    Spotify Playlists API:
+    Spotify Playlist API:
         getUserPlaylists(callback, loud)
         getPlaylists(user_id, callback, loud)
         getPlaylist(user_id, playlist_id, loud)
     */
-    var playlists = function(login) {
-        this.login = login;
+    var playlist = function(general) {
+        this.general = general;
+        this.login   = general.login;
     }
 
     // get list of user's playlists
-    playlists.prototype.getUserPlaylists = function(callback, loud) {
+    playlist.prototype.getUserPlaylists = function(callback, message) {
         var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(this.login.getUsername()) + '/playlists';
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('got playlists:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // get list of playlist from a particular user
-    playlists.prototype.getPlaylists = function(user_id, callback, loud) {
+    playlist.prototype.getPlaylists = function(user_id, callback, message) {
         var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id) + '/playlists';
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('got playlists:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // get a playlist from a particular user
-    playlists.prototype.getPlaylist = function(user_id, playlist_id, callback, loud) {
+    playlist.prototype.getPlaylist = function(user_id, playlist_id, callback, messsage) {
         var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id) + '/playlists/' + encodeURIComponent(playlist_id);
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (loud) console.log('got playlist:', r);
-                callback(r);
-            }
-        });
+        this.general.getURL(url, callback, message);
     }
 
     // TO ADD:
@@ -312,9 +234,9 @@
     var SpotifyAPI = function() {
         this.login     = new login();
         this.general   = new general(this.login);
-        this.search    = new search();
-        this.track     = new track(this.login);
-        this.playlists = new playlists(this.login);
+        this.search    = new search(this.general);
+        this.track     = new track(this.general);
+        this.playlist  = new playlist(this.general);
     }
 
     exports.SpotifyAPI = SpotifyAPI;

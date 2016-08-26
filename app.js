@@ -29,13 +29,15 @@ $(document).ready(function() {
         ];
         api.login.openLogin(scopes);
     });
-});
 
-function test() {
-    // api.Track.getTrackAudioFeatures('0rl5DA937m7eHFCMt2Wdxe', none, true)
-    // api.Playlists.getPlaylist('129874447', '1AbmWHLKFGhdhR6KYgZclO', none, true);
-    api.general.getURL('https://api.spotify.com/v1/users/129874447/playlists/1AbmWHLKFGhdhR6KYgZclO/tracks?offset=60&limit=20', none, true);
-}
+    $('#playlists-btn').click(function() {
+        api.playlist.getUserPlaylists(none, 'got playlists');
+    })
+
+    $('#test-btn').click(function() {
+        api.track.getTrack('3Ai7wKn9UYkkNuygKgf4b2', none, 'got track');
+    });
+});
 
 function parseTrackToCSV(track) {
     added_at   = track['added_at'];
