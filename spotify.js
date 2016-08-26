@@ -1,6 +1,33 @@
 (function(exports) {
 
     /*
+    Spotify General API:
+        getSelfInfo(callback, message)
+        getUserInfo(user_id, callback, message)
+    */
+    var general = function(login) {
+        this.login = login;
+    }
+
+    general.prototype.getUserInfo = function(user_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id);
+        this.getURL(url, callback, message);
+    }
+
+    general.prototype.getURL = function(url, callback, message) {
+        $.ajax(url, {
+            dataType: 'json',
+            headers: {
+                'Authorization': this.login.getAuthHeader()
+            },
+            success: function(r) {
+                if (message) console.log(message + ":", r);
+                callback(r);
+            }
+        });
+    }
+
+    /*
     Spotify Login API:
         getAccessToken()
         setAccessToken(access_token)
@@ -107,33 +134,6 @@
             },
             success: function(r) {
                 if (loud) console.log('user info:', r);
-                callback(r);
-            }
-        });
-    }
-
-    /*
-    Spotify General API:
-        getSelfInfo(callback, message)
-        getUserInfo(user_id, callback, message)
-    */
-    var general = function(login) {
-        this.login = login;
-    }
-
-    general.prototype.getUserInfo = function(user_id, callback, message) {
-        var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id);
-        this.getURL(url, callback, message);
-    }
-
-    general.prototype.getURL = function(url, callback, message) {
-        $.ajax(url, {
-            dataType: 'json',
-            headers: {
-                'Authorization': this.login.getAuthHeader()
-            },
-            success: function(r) {
-                if (message) console.log(message + ":", r);
                 callback(r);
             }
         });
