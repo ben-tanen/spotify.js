@@ -3,7 +3,7 @@ var api = new SpotifyAPI();
 function none() { }
 
 api.login.setClientId('52c0de20baf34205a23827704f80c151');
-api.login.setRedirect('http://localhost:8000/');
+api.login.setRedirect('http://localhost:8000/sample-app/');
 
 playlists = [ ];
 tracks    = [ ];
