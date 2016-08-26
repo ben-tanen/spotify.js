@@ -1,9 +1,3 @@
-/* TO DO:
-   - add Album, Artist, Library, Browse, Follow features
-   - add Top call
-   - set up POST, PUT, DELETE requests for playlists (create playlist, reorder, delete song from playlist, etc)
-*/
-
 (function(exports) {
 
     /*
