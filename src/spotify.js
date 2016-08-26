@@ -121,10 +121,6 @@
         return 'Bearer ' + this.getAccessToken();
     }
 
-    var user = function(login) {
-        this.login = login;
-    }
-
     login.prototype.getUserInfo = function(callback, loud) {
         var url = 'https://api.spotify.com/v1/me';
         $.ajax(url, {
@@ -177,20 +173,65 @@
     }
 
     // get audio features for a track
-    track.prototype.getTrackAudioFeatures = function(track_id, callback, message) {
+    track.prototype.getAudioFeatures = function(track_id, callback, message) {
         var url = 'https://api.spotify.com/v1/audio-features/'+encodeURIComponent(track_id);
         this.general.getURL(url, callback, message);
     }
 
     // get audio features for multiple tracks
-    track.prototype.getTracksAudioFeatures = function(track_ids, callback, message) {
+    track.prototype.getMultipleAudioFeatures = function(track_ids, callback, message) {
         var url = 'https://api.spotify.com/v1/audio-features?ids='+encodeURIComponent(track_ids.join(','));
         this.general.getURL(url, callback, message);
     }
 
     // get audio analysis for a track
-    track.prototype.getTrackAudioAnalysis = function(track_id, callback, message) {
+    track.prototype.getAudioAnalysis = function(track_id, callback, message) {
         var url = 'https://api.spotify.com/v1/audio-analysis/'+encodeURIComponent(track_id);
+        this.general.getURL(url, callback, message);
+    }
+
+    var album = function(general) {
+        this.general = general;
+        this.login   = general.login;
+    }
+
+    album.prototype.getAlbum = function(album_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/albums/' + encodeURIComponent(album_id);
+        this.general.getURL(url, callback, message);
+    }
+
+    album.prototype.getAlbums = function(album_ids, callback, message) {
+        var url = 'https://api.spotify.com/v1/albums?ids=' + encodeURIComponent(album_ids.join(','));
+        this.general.getURL(url, callback, message);
+    }
+
+    var artist = function(general) {
+        this.general = general;
+        this.login   = general.login;
+    }
+
+    artist.prototype.getArtist = function(artist_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/artists/' + encodeURIComponent(artist_id);
+        this.general.getURL(url, callback, message);
+    }
+
+    artist.prototype.getArtists = function(artist_ids, callback, message) {
+        var url = 'https://api.spotify.com/v1/artists?ids=' + encodeURIComponent(artist_ids.join(','));
+        this.general.getURL(url, callback, message);
+    }
+
+    artist.prototype.getAlbums = function(artist_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/artists/' + encodeURIComponent(artist_id) + '/albums';
+        this.general.getURL(url, callback, message);
+    }
+
+    artist.prototype.getTopTracks = function(artist_id, country_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/artists/' + encodeURIComponent(artist_id) + '/top-tracks?country=' + encodeURIComponent(country_id);
+        this.general.getURL(url, callback, message);
+    }
+
+    artist.prototype.getRelatedArtists = function(artist_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/artists/' + encodeURIComponent(artist_id) + '/related-artists';
         this.general.getURL(url, callback, message);
     }
 
@@ -236,6 +277,8 @@
         this.general   = new general(this.login);
         this.search    = new search(this.general);
         this.track     = new track(this.general);
+        this.artist    = new artist(this.general);
+        this.album     = new album(this.general);
         this.playlist  = new playlist(this.general);
     }
 

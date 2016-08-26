@@ -35,53 +35,9 @@ $(document).ready(function() {
     })
 
     $('#test-btn').click(function() {
-        api.track.getTrack('3Ai7wKn9UYkkNuygKgf4b2', none, 'got track');
+        api.artist.getRelatedArtists('5INjqkS1o8h1imAzPqGZBb', none, 'got artists');
     });
 });
-
-function parseTrackToCSV(track) {
-    added_at   = track['added_at'];
-    name       = track['track']['name'];
-    album      = track['track']['album']['name'];
-    popularity = track['track']['popularity'];
-
-    artists    = '';
-    for (var i = 0; i < track['track']['artists'].length; i++) {
-        artists += track['track']['artists'][i]['name'] + ',';
-    }
-
-    r = added_at + ',' + name + ',' + popularity + ',' + album + ',' + artists;
-    return r.substr(0,r.length - 1);
-}
-
-function pullPlaylists() {
-    pullAccessToken();
-
-    var url = getUserPlaylistsURL();
-
-    buildList(url,
-        function(data) {
-            playlists = $.merge(playlists, data['items']);
-        },
-        function(data) {
-            console.log('error', data);
-        },
-        function() {
-            for (var i = 0; i < playlists.length; i++) {
-                console.log(playlists[i]['name']);
-            }
-        }
-    );
-}
-
-function getUserPlaylistsURL() {
-    var username = api.login.getUsername();
-    if (username) {
-        return 'https://api.spotify.com/v1/users/' + username + '/playlists';
-    } else {
-        return '';
-    }
-}
 
 function buildList(url, next, error, done) {
     $.ajax(url, {
@@ -100,52 +56,6 @@ function buildList(url, next, error, done) {
         },
         error: function(data) {
             error(data);
-        }
-    });
-}
-
-function doLogin() {
-    var url = 'https://accounts.spotify.com/authorize?client_id=' + client_id +
-        '&response_type=token' +
-        '&scope=playlist-read-private%20playlist-read-collaborative%20user-library-read' +
-        '&redirect_uri=' + encodeURIComponent(redirect_uri);
-    var w = window.open(url, 'asdf', 'WIDTH=400,HEIGHT=500');
-}
-
-function doSearch(word, user_id, callback) {
-    console.log('search for ' + word);
-    var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id) + '/playlists/';
-    var url = 'https://api.spotify.com/v1/users/129874447/playlists';
-    $.ajax(url, {
-        dataType: 'json',
-        success: function(r) {
-            console.log('got result:', r);
-            // callback({
-            //     word: word,
-            //     tracks: r.tracks.items
-            //         .map(function(item) {
-            //             var ret = {
-            //                 name: item.name,
-            //                 artist: 'Unknown',
-            //                 artist_uri: '',
-            //                 album: item.album.name,
-            //                 album_uri: item.album.uri,
-            //                 cover_url: '',
-            //                 uri: item.uri
-            //             }
-            //             if (item.artists.length > 0) {
-            //                 ret.artist = item.artists[0].name;
-            //                 ret.artist_uri = item.artists[0].uri;
-            //             }
-            //             if (item.album.images.length > 0) {
-            //                 ret.cover_url = item.album.images[item.album.images.length - 1].url;
-            //             }
-            //             return ret;
-            //         })
-            // });
-        },
-        error: function(r) {
-            console.log('got error:', r)
         }
     });
 }
