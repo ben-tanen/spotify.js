@@ -53,6 +53,7 @@
 
     login.prototype.pullAccessToken = function(callback, loud) {
         var hash = location.hash.replace(/#/g, '');
+        var api  = this;
 
         if (hash.match('access_token=.*')) {
             if (loud) console.log('pulling access token...');
@@ -62,9 +63,9 @@
                 var key = keyvalue.substring(0, idx);
                 var val = keyvalue.substring(idx + 1);
                 if (key == 'access_token') {
-                    api.login.setAccessToken(val);
-                    api.login.getUserInfo(function(userinfo) {
-                        api.login.setUsername(userinfo.id);
+                    api.setAccessToken(val);
+                    api.getUserInfo(function(userinfo) {
+                        api.setUsername(userinfo.id);
                     });
                 }
             });
@@ -193,6 +194,11 @@
         this.general.getURL(url, callback, message);
     }
 
+    track.prototype.getUserTopTracks = function(callback, message) {
+        var url = 'https://api.spotify.com/v1/me/top/tracks?limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
     var album = function(general) {
         this.general = general;
         this.login   = general.login;
@@ -238,6 +244,11 @@
         this.general.getURL(url, callback, message);
     }
 
+    artist.prototype.getUserTopArtists = function(callback, message) {
+        var url = 'https://api.spotify.com/v1/me/top/artists?limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
     /*
     Spotify Playlist API:
         getUserPlaylists(callback, loud)
@@ -267,7 +278,7 @@
         this.general.getURL(url, callback, message);
     }
 
-    // TO ADD:
+    // TO DO:
     // - create playlist
     // - delete playlist
     // - add track to playlist
@@ -280,13 +291,66 @@
         this.login   = general.login;
     }
 
-    library.prototype.getTracks = function(country, callback, message) {
-        var url = 'https://api.spotify.com/v1/me/tracks?market=' + encodeURIComponent(country) + '&limit=50&offset=0';
+    library.prototype.getTracks = function(country_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/me/tracks?market=' + encodeURIComponent(country_id) + '&limit=50&offset=0';
         this.general.getURL(url, callback, message);
     }
 
     library.prototype.checkTracks = function(track_ids, callback, message) {
         var url = 'https://api.spotify.com/v1/me/tracks/contains?ids=' + encodeURIComponent(track_ids.join(','));
+        this.general.getURL(url, callback, message);
+    }
+
+    var browse = function(general) {
+        this.general = general;
+        this.login   = general.login;
+    }
+
+    browse.prototype.getNewReleases = function(country_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/browse/new-releases?country=' + encodeURIComponent(country_id) + '&limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
+    browse.prototype.getFeaturedPlaylists = function(country_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/browse/featured-playlists?country=' + encodeURIComponent(country_id) + '&limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
+    browse.prototype.getBrowseCategories = function(country_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/browse/categories?country=' + encodeURIComponent(country_id) + '&limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
+    browse.prototype.getCategoryPlaylists = function(category_id, country_id, callback, message) {
+        var url = 'https://api.spotify.com/v1/browse/categories/' + encodeURIComponent(category_id) + '/playlists?country=' + encodeURIComponent(country_id) + '&limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
+    browse.prototype.getGenres = function(callback, message) {
+        var url = 'https://api.spotify.com/v1/recommendations/available-genre-seeds';
+        this.general.getURL(url, callback, message);
+    }
+
+    // TO DO:
+    // - add browse getRecommendations
+
+    var follow = function(general) {
+        this.general = general;
+        this.login   = general.login;
+    }
+
+    follow.prototype.getFollowedArtists = function(callback, message) {
+        var url = 'https://api.spotify.com/v1/me/following?limit=50';
+        this.general.getURL(url, callback, message);
+    }
+
+    follow.prototype.checkFollowed = function(type, ids, callback, message) {
+        var url = 'https://api.spotify.com/v1/me/following/contains?ids=' + encodeURIComponent(ids.join(',')) + '&limit=50&type=' + encodeURIComponent(type);
+        this.general.getURL(url, callback, message);
+    }
+
+    follow.prototype.checkUsersFollowPlaylist = function(owner_id, playlist_id, check_ids, callback, message) {
+        var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(owner_id) + '/playlists/' + encodeURIComponent(playlist_id) + '/followers/contains?ids=' + encodeURIComponent(check_ids.join(','));
         this.general.getURL(url, callback, message);
     }
 
@@ -299,6 +363,8 @@
         this.album     = new album(this.general);
         this.playlist  = new playlist(this.general);
         this.library   = new library(this.general);
+        this.browse    = new browse(this.general);
+        this.follow    = new follow(this.general);
     }
 
     exports.SpotifyAPI = SpotifyAPI;

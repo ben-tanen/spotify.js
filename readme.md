@@ -5,8 +5,9 @@ Simple JS Wrapper for [Spotify Web API](https://developer.spotify.com/web-api/)
 * * *
 
 #### To Do
-- [ ] add Album, Artist, Library, Browse, Follow features
-- [ ] add TopArtists and TopSongs calls
-- [ ] set up POST, PUT, DELETE requests for playlists (create playlist, reorder, delete song from playlist, etc)
+- [x] add TopArtists and TopSongs calls
 - [x] Simplify around single AJAX function
-- [ ] Document
+- [x] add Album, Artist, Library, Browse, Follow features
+- [ ] add getRecommendations()
+- [ ] set up POST, PUT, DELETE requests (create playlist, reorder, delete song from playlist, follow user, etc.)
+- [ ] Document Code
