@@ -30,6 +30,22 @@
         });
     }
 
+    general.prototype.postURL = function(url, callback, message) {
+        $.ajax(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': spotify.login.getAuthHeader()
+            },
+            success: function(r) {
+                if (message) console.log(message + ":", r);
+                callback(r);
+            },
+            error: function(r) {
+                console.log('error:', r);
+            }
+        });
+    }
+
     /*
     Spotify Login API:
         getAccessToken()
@@ -125,7 +141,7 @@
         return 'Bearer ' + this.getAccessToken();
     }
 
-    login.prototype.getUserInfo = function(callback, loud) {
+    login.prototype.getUserInfo = function(callback, message) {
         var url = 'https://api.spotify.com/v1/me';
         $.ajax(url, {
             dataType: 'json',
@@ -133,7 +149,7 @@
                  'Authorization': this.getAuthHeader()
             },
             success: function(r) {
-                if (loud) console.log('user info:', r);
+                if (message) console.log(message + ':', r);
                 callback(r);
             }
         });
@@ -273,9 +289,14 @@
     }
 
     // get a playlist from a particular user
-    playlist.prototype.getPlaylist = function(user_id, playlist_id, callback, messsage) {
+    playlist.prototype.getPlaylist = function(user_id, playlist_id, callback, message) {
         var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id) + '/playlists/' + encodeURIComponent(playlist_id);
         this.general.getURL(url, callback, message);
+    }
+
+    playlist.prototype.addTracks = function(user_id, playlist_id, uris, callback, message) {
+        var url = 'https://api.spotify.com/v1/users/' + encodeURIComponent(user_id) + '/playlists/' + encodeURIComponent(playlist_id) + '/tracks?uris=' + encodeURIComponent(uris.join(','));
+        this.general.postURL(url, callback, message);
     }
 
     // TO DO:
@@ -332,7 +353,7 @@
     }
 
     // TO DO:
-    // - add browse getRecommendations
+    // - add browse getRecommendations()
 
     var follow = function(general) {
         this.general = general;
